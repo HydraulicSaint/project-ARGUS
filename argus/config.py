@@ -1,0 +1,1 @@
+MAP_KEY = "0d60398e9567e794c6deebdece658fdf"
