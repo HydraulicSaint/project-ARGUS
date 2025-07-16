@@ -6,3 +6,5 @@ folium
 rasterio
 numpy
 streamlit-folium
+python-dotenv
+pytest

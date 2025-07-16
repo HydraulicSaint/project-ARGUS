@@ -1,7 +1,10 @@
 import pandas as pd
 import requests
+import logging
 from io import StringIO
 from config import MAP_KEY
+
+logger = logging.getLogger(__name__)
 
 def fetch_firms_data(zone):
     # Construct bounding box string for API
@@ -21,8 +24,7 @@ def fetch_firms_data(zone):
     )
 
     try:
-        print("🌐 Requesting FIRMS data from:")
-        print(url)
+        logger.info("Requesting FIRMS data from %s", url)
 
         response = requests.get(url)
         response.raise_for_status()
@@ -33,12 +35,11 @@ def fetch_firms_data(zone):
         df = pd.read_csv(StringIO(response.text))
         df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
 
-        print("\n✅ FIRMS data pulled successfully")
-        print("Columns:", df.columns.tolist())
-        print(df.head(3).to_string())
+        logger.info("FIRMS data pulled successfully")
+        logger.debug("Columns: %s", df.columns.tolist())
 
 
         return df
     except Exception as e:
-        print("🚫 Error fetching FIRMS data:", e)
+        logger.error("Error fetching FIRMS data: %s", e)
         return pd.DataFrame()

@@ -1,6 +1,7 @@
 
 import streamlit as st
 import os
+import json
 from scanner.live_ping import scan_tiles
 from datetime import datetime
 
@@ -16,9 +17,24 @@ scan_delay = st.sidebar.slider("Delay Between Tiles (sec)", min_value=0.0, max_v
 scan_days = st.sidebar.slider("How many days back to scan?", min_value=1, max_value=7, value=3)
 optimize = st.sidebar.checkbox("🌍 Exclude open ocean & polar zones", value=True)
 
-# Apply grid optimization if enabled
-lat_range = (-60, 60) if optimize else (-90, 90)
-lon_range = (-170, 170) if optimize else (-180, 180)
+# Zone selection
+zone_files = [f for f in os.listdir("zones") if f.endswith(".json")]
+zone_choice = st.sidebar.selectbox("Zone", ["Custom"] + zone_files)
+
+if zone_choice != "Custom":
+    with open(os.path.join("zones", zone_choice), "r", encoding="utf-8") as f:
+        z = json.load(f)
+    lat_range = (z["lat_min"], z["lat_max"])
+    lon_range = (z["lon_min"], z["lon_max"])
+else:
+    default_lat = (-60, 60) if optimize else (-90, 90)
+    default_lon = (-170, 170) if optimize else (-180, 180)
+    lat_min = st.sidebar.number_input("Lat Min", value=float(default_lat[0]), format="%.2f")
+    lat_max = st.sidebar.number_input("Lat Max", value=float(default_lat[1]), format="%.2f")
+    lon_min = st.sidebar.number_input("Lon Min", value=float(default_lon[0]), format="%.2f")
+    lon_max = st.sidebar.number_input("Lon Max", value=float(default_lon[1]), format="%.2f")
+    lat_range = (lat_min, lat_max)
+    lon_range = (lon_min, lon_max)
 
 if st.sidebar.button("🚀 Launch ARGUS Scan"):
     with st.spinner("Scanning..."):

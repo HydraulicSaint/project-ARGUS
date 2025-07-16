@@ -10,7 +10,10 @@ This project scans NASA FIRMS data for thermal anomalies and visualizes the resu
    ```bash
    pip install -r requirements.txt
    ```
-2. Provide your FIRMS API key in `argus/config.py` or a `.env` file.
+2. Create a `.env` file with your FIRMS API key:
+   ```
+   FIRMS_API_KEY=YOUR_KEY_HERE
+   ```
 
 ## Usage
 
@@ -21,3 +24,11 @@ streamlit run argus/app.py
 ```
 
 Scan results will be saved to `output/grid_map.html`.
+
+## Testing
+
+Run unit tests with `pytest`:
+
+```bash
+pytest
+```
