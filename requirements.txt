@@ -8,3 +8,4 @@ numpy
 streamlit-folium
 python-dotenv
 pytest
+plotly

@@ -2,7 +2,7 @@ import folium
 from folium.plugins import HeatMap
 from typing import List, Dict
 import os
-from scanner.coarse_grid import generate_grid
+from argus.scanner.coarse_grid import generate_grid
 
 def build_map(scan_log: List[Dict], output="output/grid_map.html"):
     """Builds a 2D grid map with color-coded tiles and a heatmap layer."""
