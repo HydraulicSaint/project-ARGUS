@@ -19,6 +19,6 @@ firms_data = fetch_firms_data(selected_zone)
 # Display raw data
 if not firms_data.empty and "latitude" in firms_data.columns and "longitude" in firms_data.columns:
     st.write("### FIRMS Heat Anomalies", firms_data.head(10))
-    visualize_anomalies(firms_data, zone)
+    visualize_anomalies(firms_data, selected_zone)
 else:
     st.warning("⚠️ No valid FIRMS data found for this zone. Try a different area or broader time window.")
