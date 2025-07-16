@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from visualize.grid_map import build_map  # NEW: for visual integration
 
 def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",  lat_range=(-90, 90), lon_range=(-180, 180)):
-    tiles = generate_grid(step=step)
+    tiles = generate_grid(step=step, lat_range=lat_range, lon_range=lon_range)
     scan_log = []
 
     print(f"🔍 Starting live scan with {len(tiles)} tiles...\n")
