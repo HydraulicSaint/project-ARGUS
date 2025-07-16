@@ -36,14 +36,27 @@ else:
     lat_range = (lat_min, lat_max)
     lon_range = (lon_min, lon_max)
 
+map_path = "output/grid_map.html"
+
 if st.sidebar.button("🚀 Launch ARGUS Scan"):
+    progress_bar = st.progress(0)
+    map_placeholder = st.empty()
+
+    def update_progress(done, total):
+        progress_bar.progress(done / total)
+        if os.path.exists(map_path):
+            with open(map_path, "r", encoding="utf-8") as f:
+                html = f.read()
+            with map_placeholder:
+                st.components.v1.html(html, height=700)
+
     with st.spinner("Scanning..."):
         scan_tiles(step=tile_size, delay=scan_delay, days=scan_days,
-                   lat_range=lat_range, lon_range=lon_range)
+                   lat_range=lat_range, lon_range=lon_range,
+                   progress_callback=update_progress)
     st.success("Scan complete. Grid map updated!")
 
 # Display the latest grid map
-map_path = "output/grid_map.html"
 if os.path.exists(map_path):
     st.subheader("🌍 Thermal Scan Map")
     with open(map_path, "r", encoding="utf-8") as f:
