@@ -2,16 +2,19 @@
 
 import time
 import requests
+import logging
 from config import MAP_KEY
 from scanner.coarse_grid import generate_grid
 from datetime import datetime, timezone
 from visualize.grid_map import build_map  # NEW: for visual integration
 
+logger = logging.getLogger(__name__)
+
 def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",  lat_range=(-90, 90), lon_range=(-180, 180)):
     tiles = generate_grid(step=step, lat_range=lat_range, lon_range=lon_range)
     scan_log = []
 
-    print(f"🔍 Starting live scan with {len(tiles)} tiles...\n")
+    logger.info("Starting live scan with %d tiles", len(tiles))
 
     for tile in tiles:
         bbox = f"{tile['lon_min']},{tile['lat_min']},{tile['lon_max']},{tile['lat_max']}"
@@ -25,7 +28,7 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",  lat_range=(-
                 lines = response.text.splitlines()
                 if len(lines) > 1:
                     hit_count = len(lines) - 1
-                    print(f"🔥 {tile['name']} → {hit_count} detections")
+                    logger.info("%s - %d detections", tile['name'], hit_count)
                     scan_log.append({
                         **tile,
                         "status": "heat",
@@ -34,7 +37,7 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",  lat_range=(-
                     })
                         
                 else:
-                    print(f"✅ Clear: {tile['name']}")
+                    logger.debug("Clear: %s", tile['name'])
                     scan_log.append({
                         **tile,
                         "status": "clear",
@@ -44,20 +47,20 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",  lat_range=(-
                     # 🧠 Visual feedback every 5 tiles
                 if len(scan_log) % 5 == 0:
                     build_map(scan_log, output="output/grid_map.html")
-                    print(f"🗺️ Map updated at {len(scan_log)} tiles scanned.")
+                    logger.debug("Map updated at %d tiles scanned", len(scan_log))
 
             else:
-                print(f"⚠️ API error {response.status_code} for {tile['name']}")
+                logger.warning("API error %s for %s", response.status_code, tile['name'])
 
         except Exception as e:
-            print(f"⚠️ Error scanning {tile['name']}: {e}")
+            logger.error("Error scanning %s: %s", tile['name'], e)
 
         time.sleep(delay)
 
     # 🔁 After scanning all tiles: generate visual map
-    print("🗺️ Generating map...")
+    logger.info("Generating map...")
     build_map(scan_log, output="output/grid_map.html")
-    print("✅ Map written to output/grid_map.html")
+    logger.info("Map written to output/grid_map.html")
 
 # ✅ MAIN TRIGGER
 if __name__ == "__main__":

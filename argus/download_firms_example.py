@@ -1,8 +1,8 @@
+from .config import MAP_KEY
 import requests
 import os
 
 # === CONFIG ===
-MAP_KEY = "0d60398e9567e794c6deebdece658fdf"
 source = "VIIRS_SNPP_NRT"
 day_range = 7
 
