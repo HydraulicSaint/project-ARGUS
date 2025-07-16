@@ -4,15 +4,16 @@ import time
 import requests
 import logging
 from config import MAP_KEY
-from scanner.coarse_grid import generate_grid
+from argus.scanner.coarse_grid import generate_grid
 from datetime import datetime, timezone
-from visualize.grid_map import build_map  # NEW: for visual integration
+from argus.visualize.grid_map import build_map
+from argus.visualize.globe_map import build_globe
 
 logger = logging.getLogger(__name__)
 
 def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",
                lat_range=(-90, 90), lon_range=(-180, 180),
-               progress_callback=None):
+               progress_callback=None, globe=False):
     """Scan tiles for FIRMS detections and update the grid map.
 
     Parameters
@@ -31,6 +32,8 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",
         Longitude range to scan.
     progress_callback : callable, optional
         Function called with ``(done, total)`` after each tile is processed.
+    globe : bool, optional
+        If True, also generate a globe map in ``output/globe_map.html``.
     """
 
     tiles = generate_grid(step=step, lat_range=lat_range, lon_range=lon_range)
@@ -70,6 +73,8 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",
                     # 🧠 Visual feedback every 5 tiles
                 if len(scan_log) % 5 == 0:
                     build_map(scan_log, output="output/grid_map.html")
+                    if globe:
+                        build_globe(scan_log, output="output/globe_map.html")
                     logger.debug("Map updated at %d tiles scanned", len(scan_log))
                     if progress_callback:
                         progress_callback(idx, total_tiles)
@@ -88,6 +93,8 @@ def scan_tiles(step=5, delay=1.5, days=3, source="VIIRS_SNPP_NRT",
     # 🔁 After scanning all tiles: generate visual map
     logger.info("Generating map...")
     build_map(scan_log, output="output/grid_map.html")
+    if globe:
+        build_globe(scan_log, output="output/globe_map.html")
     logger.info("Map written to output/grid_map.html")
     if progress_callback:
         progress_callback(total_tiles, total_tiles)

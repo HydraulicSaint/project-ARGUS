@@ -25,6 +25,8 @@ streamlit run argus/app.py
 
 Scan results will be saved to `output/grid_map.html`.
 
+You can also generate a globe view of the scan by enabling the **Display Globe View** option in the Streamlit sidebar. The globe map will be written to `output/globe_map.html`.
+
 ## Satellite Image Classification
 
 When a heat anomaly is detected you can fetch a higher resolution
